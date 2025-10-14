@@ -54,7 +54,7 @@ function MapPage() {
           <h3>Map Integration Area</h3>
           <p>This space is reserved for the interactive map component</p>
           <div className="placeholder-note">
-            Backend developer: Integrate map here
+            Elhan Sir please : Integrate map here
           </div>
         </div>
       </div>

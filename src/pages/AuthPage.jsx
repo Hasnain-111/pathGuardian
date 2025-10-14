@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { LogIn, UserPlus, Shield } from 'lucide-react';
 import '../styles/AuthPage.css';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { app } from '../../firebase.js';
+
+const auth = getAuth(app);
 
 function AuthPage({ onAuth }) {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -11,6 +15,7 @@ function AuthPage({ onAuth }) {
     name: ''
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,14 +62,63 @@ function AuthPage({ onAuth }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validateForm()) {
+    if (!validateForm()) return;
+
+    setLoading(true);
+    setErrors({});
+
+    try {
+      let userCredential;
+
+      if (isSignUp) {
+        // Create new account
+        userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+
+        // Update display name
+        await updateProfile(userCredential.user, {
+          displayName: formData.name
+        });
+      } else {
+        // Sign in existing user
+        userCredential = await signInWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+      }
+
+      // Success
+      const user = userCredential.user;
       onAuth({
-        email: formData.email,
-        name: formData.name || formData.email.split('@')[0]
+        email: user.email,
+        name: user.displayName || user.email.split('@')[0]
       });
+
+      // Reset form after success
+      setFormData({
+        email: '',
+        password: '',
+        confirmPassword: '',
+        name: ''
+      });
+    } catch (error) {
+      console.error(error);
+      if (error.code === 'auth/email-already-in-use') {
+        setErrors({ email: 'Email already in use' });
+      } else if (error.code === 'auth/invalid-credential') {
+        setErrors({ email: 'Invalid email or password' });
+      } else {
+        setErrors({ general: error.message });
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,6 +152,7 @@ function AuthPage({ onAuth }) {
             <LogIn size={18} />
             <span>Sign In</span>
           </button>
+
           <button
             className={`auth-tab ${isSignUp ? 'active' : ''}`}
             onClick={() => isSignUp ? null : toggleMode()}
@@ -168,17 +223,21 @@ function AuthPage({ onAuth }) {
             </div>
           )}
 
-          <button type="submit" className="auth-button">
-            {isSignUp ? (
-              <>
-                <UserPlus size={20} />
-                <span>Create Account</span>
-              </>
-            ) : (
-              <>
-                <LogIn size={20} />
-                <span>Sign In</span>
-              </>
+          {errors.general && <p className="error-text">{errors.general}</p>}
+
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? 'Processing...' : (
+              isSignUp ? (
+                <>
+                  <UserPlus size={20} />
+                  <span>Create Account</span>
+                </>
+              ) : (
+                <>
+                  <LogIn size={20} />
+                  <span>Sign In</span>
+                </>
+              )
             )}
           </button>
         </form>

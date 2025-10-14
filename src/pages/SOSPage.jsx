@@ -41,13 +41,13 @@ function SOSPage() {
             <h3>Emergency Contacts:</h3>
             <div className="contact-list">
               <div className="contact-item">
-                <strong>Emergency:</strong> 911
+                <strong>Emergency:</strong> 100
               </div>
               <div className="contact-item">
-                <strong>Police:</strong> 911
+                <strong>Police:</strong> 100
               </div>
               <div className="contact-item">
-                <strong>Fire:</strong> 911
+                <strong>Fire:</strong> 102
               </div>
             </div>
           </div>
