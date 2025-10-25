@@ -18,6 +18,7 @@ function AppContent() {
 
   const handleAuth = (userData) => {
     setUser(userData);
+
     navigate('/home');
   };
 
@@ -35,7 +36,7 @@ function AppContent() {
       <Navbar user={user} onLogout={handleLogout} />
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/" element={<Navigate to="/home" replace />} /> //yaha se change ho rha h
           <Route path="/home" element={<HomePage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/report" element={<ReportPage />} />
