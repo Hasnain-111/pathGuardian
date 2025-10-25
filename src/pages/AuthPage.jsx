@@ -98,8 +98,14 @@ function AuthPage({ onAuth }) {
       const user = userCredential.user;
       onAuth({
         email: user.email,
-        name: user.displayName || user.email.split('@')[0]
+        name: user.displayName || user.email.split('@')[0],
+        
+        
       });
+      console.log("Email of user",user.email);
+      console.log("display name",user.displayName);
+      
+      
 
       // Reset form after success
       setFormData({
