@@ -7,10 +7,10 @@ import MapPage from './pages/MapPage.jsx';
 import ReportPage from './pages/ReportPage.jsx';
 import SOSPage from './pages/SOSPage.jsx';
 import AuthPage from './pages/AuthPage.jsx';
-import {getDatabase} from 'firebase/database';
-import {app} from '../firebase.js';
+// import {getDatabase} from 'firebase/database';
+// import {app} from '../firebase.js';
 
-const db = getDatabase(app);
+// const db = getDatabase(app);
 
 function AppContent() {
   const [user, setUser] = useState(null);

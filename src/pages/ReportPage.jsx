@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
 import '../styles/ReportPage.css';
+import { db } from '../../firebase';
+import { ref, push } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
 
 function ReportPage() {
   const [issueType, setIssueType] = useState('');
@@ -16,7 +19,7 @@ function ReportPage() {
     'Other'
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!issueType || !description) {
@@ -24,13 +27,33 @@ function ReportPage() {
       return;
     }
 
-    setShowSuccess(true);
-    setIssueType('');
-    setDescription('');
+    const auth = getAuth();
+    const user = auth.currentUser;
 
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 3000);
+    try {
+      //  Send data to Firebase 
+      const reportsRef = ref(db, "reports");
+      await push(reportsRef, {
+        issueType,
+        description,
+        timestamp: new Date().toISOString(),
+        userId: user ? user.uid : "guest",
+        userEmail: user ? user.email : "unknown"
+      });
+
+      
+      setShowSuccess(true);
+      setIssueType('');
+      setDescription('');
+
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 3000);
+
+    } catch (error) {
+      console.error("Error saving report:", error);
+      alert("Failed to submit report. Please try again.");
+    }
   };
 
   return (
